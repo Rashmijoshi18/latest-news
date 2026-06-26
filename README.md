@@ -1,13 +1,15 @@
 # 📰 GNews Reader
+# 📰 GNews Reader 
 
 [![Node Version](https://img.shields.io/badge/node-%3E%3D%2018.0.0-blue.svg?style=for-the-badge)](https://nodejs.org/)
 [![React Version](https://img.shields.io/badge/React-19.x-blue?style=for-the-badge&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-Bundler-9333ea?style=for-the-badge&logo=vite)](https://vite.dev/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-A high-performance, beautifully styled, full-stack news reading application built with a **React (Vite) frontend** and an **Express (Node.js) backend**. The application pulls live news articles using the GNews API, managing state gracefully on the client while establishing rigorous request caching, sanitation, and security rate limits on the backend.
+A high-performance, beautifully styled, full-stack news reading application built with a **React (Vite) TypeScript frontend** and an **Express (Node.js) backend**. The application pulls live news articles using the GNews API, managing state gracefully on the client while establishing rigorous request caching, sanitation, and security rate limits on the backend.
 
-Designed as an interview-ready showcase, the project emphasizes clean engineering patterns, custom React hooks, responsive UI layouts with zero UI frameworks (pure CSS), and offline-resilient local persistence.
+Designed as an interview-ready showcase, the project emphasizes clean engineering patterns, custom React hooks in TypeScript, responsive UI layouts with zero UI frameworks (pure CSS), and offline-resilient local persistence.
 
 ---
 
@@ -38,6 +40,7 @@ Designed as an interview-ready showcase, the project emphasizes clean engineerin
 ## 🛠️ Tech Stack & Badges
 
 ### Frontend
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
@@ -60,38 +63,42 @@ latest-news/
 │   ├── controllers/           # Route logic handlers
 │   ├── models/                # MongoDB/Mongoose Schemas
 │   ├── routes/                # Endpoint routes definitions
+│   ├── utils/                 # Caching and mock news data modules
 │   ├── render.yaml            # Render hosting cloud configurations
 │   ├── index.js               # Server boot, environment & rate-limit configuration
 │   └── package.json
 └── news-frontend/             # React Application (Vite-powered)
     ├── vercel.json            # Vercel SPA routing redirects
+    ├── tsconfig.json          # Main TypeScript reference configs
+    ├── tsconfig.app.json      # App TypeScript compile rules
+    ├── tsconfig.node.json     # Node scripts (Vite configs) compiler rules
     ├── index.html
     ├── src/
-    │   ├── main.jsx           # Mounting logic and global stylesheet loading
-    │   ├── App.jsx            # Routing, global alerts, and state coordinator
+    │   ├── main.tsx           # Mounting logic and global stylesheet loading
+    │   ├── App.tsx            # Routing, global alerts, and state coordinator
     │   ├── components/        # Reusable visual components
-    │   │   ├── ErrorBoundary.jsx
-    │   │   ├── Navbar.jsx
-    │   │   ├── NewsCard.jsx
-    │   │   ├── Skeleton.jsx
-    │   │   └── Toast.jsx
+    │   │   ├── ErrorBoundary.tsx
+    │   │   ├── Navbar.tsx
+    │   │   ├── NewsCard.tsx
+    │   │   ├── Skeleton.tsx
+    │   │   └── Toast.tsx
     │   ├── constants/         # Static lookup collections & clients
-    │   │   ├── api.js
-    │   │   └── categories.js
+    │   │   ├── api.ts
+    │   │   └── categories.ts
     │   ├── hooks/             # Custom React Hooks
-    │   │   ├── useBookmarks.js
-    │   │   ├── useDarkMode.js
-    │   │   └── useNews.js
+    │   │   ├── useBookmarks.ts
+    │   │   ├── useDarkMode.ts
+    │   │   └── useNews.ts
     │   ├── pages/             # Page-level route targets
-    │   │   ├── Bookmarks.jsx
-    │   │   ├── Home.jsx
-    │   │   └── NotFound.jsx
+    │   │   ├── Bookmarks.tsx
+    │   │   ├── Home.tsx
+    │   │   └── NotFound.tsx
     │   ├── styles/            # Themes & Core layouts
     │   │   ├── global.css
     │   │   └── variables.css
     │   └── utils/             # Independent helper modules
-    │       ├── formatDate.js
-    │       └── truncateText.js
+    │       ├── formatDate.ts
+    │       └── truncateText.ts
     └── package.json
 ```
 
@@ -156,6 +163,7 @@ The backend routes serve news articles and store MongoDB articles if configured:
 
 Building this application helped me practice and implement several key full-stack software design concepts:
 
+* **TypeScript Type Safety & Quality Standards:** Migrated the frontend React client to TypeScript. Defined strict interface boundaries for news payloads (`Article`, `ArticleSource`), custom hooks, and React component props, preventing compilation bugs and ensuring standard production safety.
 * **Custom Hooks for State Isolation:** Separating core logic (fetching news, toggling dark mode, saving bookmarks) into reusable hooks (`useNews`, `useDarkMode`, `useBookmarks`) keeps components modular, testable, and clean.
 * **Optimized Web API Integration:** Using `IntersectionObserver` for infinite scroll instead of bloated external libraries keeps the package bundle small. Implementing debouncing on search parameters saves GNews API quota usage.
 * **Defensive Frontend Engineering:** Wrapped the layout inside a custom React class `ErrorBoundary` so that single-component rendering bugs catch gracefully instead of displaying a blank white browser screen.
