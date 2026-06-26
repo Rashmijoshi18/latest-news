@@ -67,7 +67,7 @@ mongoose.connect(mongoUri)
 app.use("/api/articles", articleRoutes);
 
 // Allowed options for query param validation
-const allowedCountries = ["us", "in", "gb", "au", "ca", "fr", "de", "jp", "ru", "cn", "za"];
+const allowedCountries = ["us", "in", "gb", "au", "ca", "sg", "ie"];
 const allowedTopics = ["general", "world", "nation", "business", "technology", "sports", "entertainment", "science", "health"];
 
 // Fetch News Route with validation/sanitization, caching, and mock fallbacks

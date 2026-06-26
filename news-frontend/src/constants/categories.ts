@@ -14,12 +14,8 @@ export const COUNTRIES: Country[] = [
   { code: "gb", name: "🇬🇧 United Kingdom" },
   { code: "au", name: "🇦🇺 Australia" },
   { code: "ca", name: "🇨🇦 Canada" },
-  { code: "fr", name: "🇫🇷 France" },
-  { code: "de", name: "🇩🇪 Germany" },
-  { code: "jp", name: "🇯🇵 Japan" },
-  { code: "ru", name: "🇷🇺 Russia" },
-  { code: "cn", name: "🇨🇳 China" },
-  { code: "za", name: "🇿🇦 South Africa" },
+  { code: "sg", name: "🇸🇬 Singapore" },
+  { code: "ie", name: "🇮🇪 Ireland" },
 ];
 
 export const CATEGORIES: Category[] = [
