@@ -1,3 +1,4 @@
+# 📰 GNews Reader
 # 📰 GNews Reader 
 
 [![Node Version](https://img.shields.io/badge/node-%3E%3D%2018.0.0-blue.svg?style=for-the-badge)](https://nodejs.org/)
