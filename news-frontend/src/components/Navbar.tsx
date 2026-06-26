@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
+import { Theme } from "../hooks/useDarkMode";
+
+interface NavbarProps {
+  theme: Theme;
+  onThemeToggle: () => void;
+}
 
 /**
  * Navbar component for primary page navigation, responsive links drawer,
  * bookmark count display, and light/dark theme toggles.
  * 
- * @param {Object} props
- * @param {string} props.theme - The current active theme ("light" | "dark")
- * @param {function} props.onThemeToggle - Handler function to toggle between light/dark themes
+ * @param props
+ * @param props.theme - The current active theme ("light" | "dark")
+ * @param props.onThemeToggle - Handler function to toggle between light/dark themes
  */
-export default function Navbar({ theme, onThemeToggle }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [bookmarksCount, setBookmarksCount] = useState(() => {
+export default function Navbar({ theme, onThemeToggle }: NavbarProps) {
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [bookmarksCount, setBookmarksCount] = useState<number>(() => {
     try {
       const saved = localStorage.getItem("news_bookmarks");
       return saved ? JSON.parse(saved).length : 0;
@@ -30,9 +36,7 @@ export default function Navbar({ theme, onThemeToggle }) {
       }
     };
 
-    // Listen to custom local bookmarks changes
     window.addEventListener("bookmarksChanged", updateCount);
-    // Listen to cross-tab updates
     window.addEventListener("storage", updateCount);
 
     return () => {

@@ -1,6 +1,7 @@
-/**
- * SkeletonCard component renders a single placeholder card with shimmer effect.
- */
+interface SkeletonProps {
+  count?: number;
+}
+
 function SkeletonCard() {
   return (
     <div className="skeleton-card" aria-hidden="true">
@@ -27,10 +28,9 @@ function SkeletonCard() {
 /**
  * Skeleton component renders multiple SkeletonCards in a news-grid layout.
  * 
- * @param {Object} props
- * @param {number} [props.count=6] - Number of skeleton cards to render
+ * @param count - Number of skeleton cards to render
  */
-export default function Skeleton({ count = 6 }) {
+export default function Skeleton({ count = 6 }: SkeletonProps) {
   const cards = Array.from({ length: count }, (_, idx) => idx);
   return (
     <div className="news-grid">

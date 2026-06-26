@@ -1,4 +1,14 @@
-export const COUNTRIES = [
+export interface Country {
+  code: string;
+  name: string;
+}
+
+export interface Category {
+  code: string;
+  name: string;
+}
+
+export const COUNTRIES: Country[] = [
   { code: "in", name: "🇮🇳 India" },
   { code: "us", name: "🇺🇸 USA" },
   { code: "gb", name: "🇬🇧 United Kingdom" },
@@ -12,7 +22,7 @@ export const COUNTRIES = [
   { code: "za", name: "🇿🇦 South Africa" },
 ];
 
-export const CATEGORIES = [
+export const CATEGORIES: Category[] = [
   { code: "general", name: "📰 General" },
   { code: "world", name: "🌐 World" },
   { code: "nation", name: "🏙️ Nation" },

@@ -1,23 +1,27 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import useBookmarks from "../hooks/useBookmarks";
+import useBookmarks, { Article } from "../hooks/useBookmarks";
 import NewsCard from "../components/NewsCard";
 import { CATEGORIES } from "../constants/categories";
+
+interface BookmarksProps {
+  onShowToast: (message: string) => void;
+}
 
 /**
  * Bookmarks page component to manage locally-saved articles.
  * Displays bookmarked items with search filter functionality.
  * 
- * @param {Object} props
- * @param {function} props.onShowToast - Callback function to display toast notifications
+ * @param props
+ * @param props.onShowToast - Callback function to display toast notifications
  */
-export default function Bookmarks({ onShowToast }) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [topicFilter, setTopicFilter] = useState("");
+export default function Bookmarks({ onShowToast }: BookmarksProps) {
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [topicFilter, setTopicFilter] = useState<string>("");
   
   const { bookmarks, toggleBookmark, isBookmarked } = useBookmarks();
 
-  const handleBookmarkToggle = (article) => {
+  const handleBookmarkToggle = (article: Article) => {
     toggleBookmark(article);
     onShowToast("Bookmark status updated");
   };

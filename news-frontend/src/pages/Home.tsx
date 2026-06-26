@@ -1,30 +1,33 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import useNews from "../hooks/useNews";
-import useBookmarks from "../hooks/useBookmarks";
+import useBookmarks, { Article } from "../hooks/useBookmarks";
 import NewsCard from "../components/NewsCard";
 import Skeleton from "../components/Skeleton";
-import Toast from "../components/Toast";
 import { COUNTRIES, CATEGORIES } from "../constants/categories";
+
+interface HomeProps {
+  onShowToast: (message: string) => void;
+}
 
 /**
  * Home page component for reading the latest news articles.
  * Integrates search, pagination, category filtering, infinite scroll,
  * and visual progress bar animations.
  * 
- * @param {Object} props
- * @param {function} props.onShowToast - Callback function to show global toast alerts
+ * @param props
+ * @param props.onShowToast - Callback function to show global toast alerts
  */
-export default function Home({ onShowToast }) {
-  const [country, setCountry] = useState("in");
-  const [category, setCategory] = useState("general");
-  const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+export default function Home({ onShowToast }: HomeProps) {
+  const [country, setCountry] = useState<string>("in");
+  const [category, setCategory] = useState<string>("general");
+  const [page, setPage] = useState<number>(1);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   
   // Progress bar animation state
-  const [progressState, setProgressState] = useState("idle");
+  const [progressState, setProgressState] = useState<"loading" | "finished" | "idle">("idle");
 
-  const observerRef = useRef(null);
+  const observerRef = useRef<HTMLDivElement | null>(null);
 
   // Debounce search queries to optimize backend load
   useEffect(() => {
@@ -64,7 +67,7 @@ export default function Home({ onShowToast }) {
 
   // Infinite scroll callback
   const handleObserver = useCallback(
-    (entries) => {
+    (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
       if (target.isIntersecting && hasMore && !loading && error === null) {
         setPage((prev) => prev + 1);
@@ -94,7 +97,7 @@ export default function Home({ onShowToast }) {
   }, [handleObserver]);
 
   // Bookmark toggle wrapping toast
-  const handleBookmarkToggle = (article) => {
+  const handleBookmarkToggle = (article: Article) => {
     const wasBookmarked = isBookmarked(article.url);
     toggleBookmark(article);
     onShowToast(
@@ -102,7 +105,7 @@ export default function Home({ onShowToast }) {
     );
   };
 
-  const handleCountryChange = (e) => {
+  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCountry(e.target.value);
   };
 

@@ -1,15 +1,22 @@
 import { useEffect } from "react";
 
+interface ToastProps {
+  message: string;
+  type?: "success" | "error";
+  onClose: () => void;
+  duration?: number;
+}
+
 /**
  * Toast component displays temporary notification banners (e.g. success/error actions).
  * 
- * @param {Object} props
- * @param {string} props.message - Text alert message
- * @param {string} [props.type="success"] - Alert color category ("success" | "error")
- * @param {function} props.onClose - Action callback when timer runs out
- * @param {number} [props.duration=3000] - Duration in milliseconds before fading
+ * @param props
+ * @param props.message - Text alert message
+ * @param props.type - Alert color category ("success" | "error")
+ * @param props.onClose - Action callback when timer runs out
+ * @param props.duration - Duration in milliseconds before fading
  */
-export default function Toast({ message, type = "success", onClose, duration = 3000 }) {
+export default function Toast({ message, type = "success", onClose, duration = 3000 }: ToastProps) {
   useEffect(() => {
     if (!message) return;
 

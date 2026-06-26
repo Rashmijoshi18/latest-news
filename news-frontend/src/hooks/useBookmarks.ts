@@ -1,12 +1,35 @@
 import { useState, useEffect } from "react";
 
+export interface ArticleSource {
+  name: string;
+  url?: string;
+}
+
+export interface Article {
+  title: string;
+  description: string;
+  url: string;
+  image?: string;
+  urlToImage?: string;
+  publishedAt?: string;
+  topic?: string;
+  source?: ArticleSource;
+}
+
+export interface BookmarksHookResult {
+  bookmarks: Article[];
+  toggleBookmark: (article: Article) => void;
+  isBookmarked: (url: string) => boolean;
+  bookmarksCount: number;
+}
+
 /**
  * Custom hook to manage bookmark saving and retrieval in LocalStorage.
  * 
- * @returns {Object} Bookmarking states and event triggers.
+ * @returns Object containing bookmarks array, toggler, count, and lookup helpers.
  */
-export default function useBookmarks() {
-  const [bookmarks, setBookmarks] = useState(() => {
+export default function useBookmarks(): BookmarksHookResult {
+  const [bookmarks, setBookmarks] = useState<Article[]>(() => {
     try {
       const saved = localStorage.getItem("news_bookmarks");
       return saved ? JSON.parse(saved) : [];
@@ -20,25 +43,22 @@ export default function useBookmarks() {
     localStorage.setItem("news_bookmarks", JSON.stringify(bookmarks));
   }, [bookmarks]);
 
-  const addBookmark = (article) => {
+  const addBookmark = (article: Article) => {
     if (!article.url) return;
     setBookmarks((prev) => {
-      // Avoid duplicate bookmarks
       if (prev.some((b) => b.url === article.url)) return prev;
-      // standardizing property names if needed (e.g. image vs urlToImage)
-      const normalizedArticle = {
+      const imageUrl = article.image || article.urlToImage;
+      const normalizedArticle: Article = {
         title: article.title,
         description: article.description,
         url: article.url,
-        // GNews uses .image, keep both key names so it works seamlessly
-        image: article.image || article.urlToImage,
-        urlToImage: article.image || article.urlToImage,
+        image: imageUrl,
+        urlToImage: imageUrl,
         source: article.source,
         publishedAt: article.publishedAt,
         topic: article.topic || "general"
       };
       
-      // Dispatch a custom event to notify other parts of the app (like Navbar count)
       setTimeout(() => {
         window.dispatchEvent(new Event("bookmarksChanged"));
       }, 0);
@@ -47,7 +67,7 @@ export default function useBookmarks() {
     });
   };
 
-  const removeBookmark = (url) => {
+  const removeBookmark = (url: string) => {
     setBookmarks((prev) => {
       const filtered = prev.filter((b) => b.url !== url);
       setTimeout(() => {
@@ -57,7 +77,7 @@ export default function useBookmarks() {
     });
   };
 
-  const toggleBookmark = (article) => {
+  const toggleBookmark = (article: Article) => {
     if (isBookmarked(article.url)) {
       removeBookmark(article.url);
     } else {
@@ -65,7 +85,7 @@ export default function useBookmarks() {
     }
   };
 
-  const isBookmarked = (url) => {
+  const isBookmarked = (url: string): boolean => {
     return bookmarks.some((b) => b.url === url);
   };
 

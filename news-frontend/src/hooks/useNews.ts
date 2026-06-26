@@ -1,25 +1,39 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import API from "../constants/api";
+import { Article } from "./useBookmarks";
+
+export interface NewsHookResult {
+  articles: Article[];
+  loading: boolean;
+  error: string | null;
+  hasMore: boolean;
+  totalArticles: number;
+  retry: () => void;
+}
 
 /**
  * Custom hook to handle fetching news articles from the backend server.
  * Handles category, query search, pagination, loading states, and error handling.
  * 
- * @param {string} category News category (general, technology, etc.)
- * @param {string} query Keyword search input
- * @param {number} page Current page number
- * @param {string} country Selected country code
- * @returns {Object} Fetching states, article results, and retry helper.
+ * @param category News category (general, technology, etc.)
+ * @param query Keyword search input
+ * @param page Current page number
+ * @param country Selected country code
+ * @returns Fetching states, article results, and retry helper.
  */
-export default function useNews(category, query, page, country) {
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [totalArticles, setTotalArticles] = useState(0);
+export default function useNews(
+  category: string,
+  query: string,
+  page: number,
+  country: string
+): NewsHookResult {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [totalArticles, setTotalArticles] = useState<number>(0);
 
-  // Keep track of the active request to ignore stale responses
-  const activeRequestRef = useRef(0);
+  const activeRequestRef = useRef<number>(0);
 
   // Reset articles list when filters change
   useEffect(() => {
@@ -29,17 +43,23 @@ export default function useNews(category, query, page, country) {
     setError(null);
   }, [category, query, country]);
 
-  const fetchNews = useCallback(async (isRetry = false) => {
-    // Increment the active request counter
+  const fetchNews = useCallback(async (isRetry: boolean = false) => {
     const currentRequestId = ++activeRequestRef.current;
 
-    // Prevent fetching if we know there is no more data (unless page is 1)
     if (page > 1 && !hasMore && !isRetry) return;
 
     setLoading(true);
     setError(null);
 
-    const params = {
+    interface NewsParams {
+      country: string;
+      max: number;
+      page: number;
+      topic?: string;
+      q?: string;
+    }
+
+    const params: NewsParams = {
       country,
       max: 10,
       page,
@@ -52,16 +72,14 @@ export default function useNews(category, query, page, country) {
       params.q = query.trim();
     }
 
-    let response;
     let retries = 0;
     const maxRetries = 3;
 
-    // Network helper with retry capabilities for concurrency boot delay
-    const attemptFetch = async () => {
+    // Retry loop in case backend server is booting concurrently
+    const attemptFetch = async (): Promise<any> => {
       try {
         return await API.get("/news", { params });
-      } catch (err) {
-        // If it's a network connection error (backend is still booting), retry
+      } catch (err: any) {
         const isNetworkErr = !err.response && err.request;
         if (isNetworkErr && retries < maxRetries && currentRequestId === activeRequestRef.current) {
           retries++;
@@ -74,13 +92,12 @@ export default function useNews(category, query, page, country) {
     };
 
     try {
-      response = await attemptFetch();
+      const response = await attemptFetch();
 
-      // Ignore this response if a newer request has already started
       if (currentRequestId !== activeRequestRef.current) return;
 
-      const fetchedArticles = response.data.articles || [];
-      const total = response.data.totalArticles || 0;
+      const fetchedArticles: Article[] = response.data.articles || [];
+      const total: number = response.data.totalArticles || 0;
 
       setTotalArticles(total);
       
@@ -88,7 +105,6 @@ export default function useNews(category, query, page, country) {
         if (page === 1) {
           return fetchedArticles;
         }
-        // Deduplicate articles just in case GNews duplicates them across pages
         const combined = [...prev, ...fetchedArticles];
         const unique = combined.filter(
           (article, index, self) =>
@@ -97,15 +113,12 @@ export default function useNews(category, query, page, country) {
         return unique;
       });
 
-      // GNews API returns totalArticles.
-      // If we have fetched as many or more than totalArticles, or we get empty articles
       if (fetchedArticles.length === 0 || (page * 10) >= total) {
         setHasMore(false);
       } else {
         setHasMore(true);
       }
-    } catch (err) {
-      // Ignore this error if a newer request has already started
+    } catch (err: any) {
       if (currentRequestId !== activeRequestRef.current) return;
 
       console.error("useNews fetch error:", err);
@@ -129,7 +142,7 @@ export default function useNews(category, query, page, country) {
     }
   }, [category, query, page, country, hasMore]);
 
-  // Fetch articles when page or trigger changes
+  // Fetch articles when parameters update
   useEffect(() => {
     fetchNews();
   }, [category, query, page, country]);

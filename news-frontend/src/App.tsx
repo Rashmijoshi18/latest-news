@@ -12,7 +12,10 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import Toast from "./components/Toast";
 import useDarkMode from "./hooks/useDarkMode";
 
-// Global styling is imported in main.jsx
+interface ToastState {
+  message: string;
+  type: "success" | "error";
+}
 
 /**
  * Main App component. Setups layout containers, error boundaries,
@@ -20,10 +23,10 @@ import useDarkMode from "./hooks/useDarkMode";
  */
 function App() {
   const [theme, toggleTheme] = useDarkMode();
-  const [toast, setToast] = useState({ message: "", type: "success" });
+  const [toast, setToast] = useState<ToastState>({ message: "", type: "success" });
 
   // Callbacks for global triggers
-  const showToast = useCallback((message, type = "success") => {
+  const showToast = useCallback((message: string, type: "success" | "error" = "success") => {
     setToast({ message, type });
   }, []);
 

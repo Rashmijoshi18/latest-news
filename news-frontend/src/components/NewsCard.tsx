@@ -1,34 +1,24 @@
+import { Article } from "../hooks/useBookmarks";
 import formatDate from "../utils/formatDate";
 import truncateText from "../utils/truncateText";
 
-/**
- * @typedef {Object} ArticleSource
- * @property {string} name - Name of the publisher source
- * @property {string} [url] - URL of the source
- */
-
-/**
- * @typedef {Object} Article
- * @property {string} title - Title of the article
- * @property {string} description - Short description of the article
- * @property {string} url - Web link of the article
- * @property {string} [image] - GNews article image
- * @property {string} [urlToImage] - NewsAPI/Fallback article image
- * @property {string} [publishedAt] - ISO date string of publication
- * @property {string} [topic] - Category / Topic
- * @property {ArticleSource} source - Source details
- */
+interface NewsCardProps {
+  article: Article;
+  isBookmarked: boolean;
+  onBookmarkToggle: (article: Article) => void;
+  onShareSuccess: (message: string) => void;
+}
 
 /**
  * NewsCard component displays a single news article in a grid card.
  * 
- * @param {Object} props
- * @param {Article} props.article - The article data
- * @param {boolean} props.isBookmarked - Bookmark status of the article
- * @param {function} props.onBookmarkToggle - Handler function to toggle bookmarks
- * @param {function} props.onShareSuccess - Success callback when link is copied or shared
+ * @param props
+ * @param props.article - The article data
+ * @param props.isBookmarked - Bookmark status of the article
+ * @param props.onBookmarkToggle - Handler function to toggle bookmarks
+ * @param props.onShareSuccess - Success callback when link is copied or shared
  */
-export default function NewsCard({ article, isBookmarked, onBookmarkToggle, onShareSuccess }) {
+export default function NewsCard({ article, isBookmarked, onBookmarkToggle, onShareSuccess }: NewsCardProps) {
   const { title, description, url, publishedAt, source, topic } = article;
   
   // Normalize GNews 'image' and traditional 'urlToImage'
@@ -39,12 +29,12 @@ export default function NewsCard({ article, isBookmarked, onBookmarkToggle, onSh
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const handleBookmarkClick = (e) => {
+  const handleBookmarkClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onBookmarkToggle(article);
   };
 
-  const handleShareClick = async (e) => {
+  const handleShareClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
     const shareData = {
@@ -56,7 +46,7 @@ export default function NewsCard({ article, isBookmarked, onBookmarkToggle, onSh
     if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
       try {
         await navigator.share(shareData);
-      } catch (err) {
+      } catch (err: any) {
         if (err.name !== "AbortError") {
           console.error("Web Share failed:", err);
           fallbackCopy();
@@ -86,9 +76,12 @@ export default function NewsCard({ article, isBookmarked, onBookmarkToggle, onSh
             alt={title} 
             loading="lazy" 
             onError={(e) => {
-              e.target.onerror = null;
-              e.target.style.display = "none";
-              e.target.parentNode.classList.add("skeleton-shimmer");
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.style.display = "none";
+              if (target.parentNode) {
+                (target.parentNode as HTMLElement).classList.add("skeleton-shimmer");
+              }
             }}
           />
         ) : (

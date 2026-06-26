@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 
+export type Theme = "light" | "dark";
+
 /**
- * Custom hook to manage application color theme (light/dark mode).
- * Persists selection in LocalStorage and applies theme to the document.
+ * Custom hook to manage color themes.
  * 
- * @returns {[string, () => void]} Current theme and toggle function.
+ * @returns Tuple containing active theme and toggler function.
  */
-export default function useDarkMode() {
-  const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved) return saved;
-    // Fallback to system preference
+export default function useDarkMode(): [Theme, () => void] {
+  const [theme, setTheme] = useState<Theme>(() => {
+    const saved = localStorage.getItem("theme") as Theme | null;
+    if (saved && (saved === "light" || saved === "dark")) return saved;
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     return prefersDark ? "dark" : "light";
   });
