@@ -1,0 +1,14 @@
+{
+  "name": "latest-news-root",
+  "version": "1.0.0",
+  "description": "Root package for running news frontend and backend concurrently",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix news-backend\" \"npm run dev --prefix news-frontend\"",
+    "build": "cd news-frontend && npm run build",
+    "start:prod": "cd news-backend && node index.js"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

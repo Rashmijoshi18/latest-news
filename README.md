@@ -1,233 +1,177 @@
-# 📰 Full-Stack News Application
+# 📰 GNews Reader — Placement-Ready News Application
 
-A complete full-stack news web application built with a **React** frontend and a **Node.js/Express** backend. The app fetches, serves, and displays the latest news articles in a clean, responsive user interface.
+[![Node Version](https://img.shields.io/badge/node-%3E%3D%2018.0.0-blue.svg?style=for-the-badge)](https://nodejs.org/)
+[![React Version](https://img.shields.io/badge/React-19.x-blue?style=for-the-badge&logo=react)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-Bundler-9333ea?style=for-the-badge&logo=vite)](https://vite.dev/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](LICENSE)
+
+A high-performance, beautifully styled, full-stack news reading application built with a **React (Vite) frontend** and an **Express (Node.js) backend**. The application pulls live news articles using the GNews API, managing state gracefully on the client while establishing rigorous request caching, sanitation, and security rate limits on the backend.
+
+Designed as an interview-ready showcase, the project emphasizes clean engineering patterns, custom React hooks, responsive UI layouts with zero UI frameworks (pure CSS), and offline-resilient local persistence.
 
 ---
 
-## 📁 Project Structure
+## 🎨 Preview & Live Demo
+
+> **Live Demo Link:** `https://your-portfolio-link.vercel.app` *(Replace with your deployment)*
 
 ```
-full-project/
-├── news-backend/        # Node.js + Express REST API
-└── news-frontend/       # React.js client application
+[ INSERT APP GIF / SCREENSHOT CAROUSEL HERE ]
 ```
 
 ---
 
-## 🚀 Features
+## 🚀 Features Checklist
 
-- 📡 Fetches latest news articles via a backend API
-- 🗂️ Browse news by categories
-- 🔍 Search for news articles
-- 📱 Fully responsive design
-- ⚡ Fast and lightweight frontend built with React
-- 🔒 Backend handles API keys securely (not exposed to the client)
-- 🌐 RESTful API with clear endpoints
+- [x] **🌓 Dynamic Dark Mode Toggle** — Instantly switch between light and dark modes. State is fully synchronized across the application and persisted in `localStorage`.
+- [x] **⭐ Client-Side Bookmarks** — Save articles to read offline. Includes a responsive badge count in the navigation bar that synchronizes instantly using cross-component custom events.
+- [x] **♾️ Infinite Scroll** — Replaces jerky pagination with an elegant, infinite-scrolling feed powered by the native HTML5 `IntersectionObserver` API.
+- [x] **⚡ Shimmer Skeleton Loaders** — Uses CSS-only animated placeholder cards while articles are loading, avoiding layout shifts (CLS) and replacing generic loaders.
+- [x] **🔗 Web Share Integration** — Seamlessly share articles with native device menus using the `navigator.share` API, falling back to clipboard copying with toast confirmation alerts.
+- [x] **📈 Top Progress Loading Bar** — An animating top loading indicator bar running at the header during server roundtrips, styled using CSS transitions.
+- [x] **🛡️ Backend Rate-Limiting** — Express server rate limits requests (100 requests / 15 mins per IP) using `express-rate-limit` to prevent denial-of-service and API abuse.
+- [x] **🧹 Query Input Sanitation** — Sanitizes, validates, and filters incoming URL query parameters on the backend utilizing `express-validator` to mitigate security exploits.
+- [x] **⚠️ Error Boundary & Empty States** — Handles JavaScript errors gracefully without crashing the whole application, showing friendly error recovery cards and interactive empty states.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Badges
 
 ### Frontend
-| Technology | Purpose |
-|---|---|
-| React.js | UI framework |
-| CSS3 | Styling & layout |
-| HTML5 | Markup |
-| Axios / Fetch API | HTTP requests to backend |
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 
 ### Backend
-| Technology | Purpose |
-|---|---|
-| Node.js | JavaScript runtime |
-| Express.js | Web framework / REST API |
-| NewsAPI / Third-party API | News data source |
-| dotenv | Environment variable management |
-| CORS | Cross-origin resource sharing |
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)
 
 ---
 
-## ⚙️ Getting Started
+## 📁 Folder Structure Directory Tree
 
-### Prerequisites
-
-Make sure you have the following installed on your system:
-
-- [Node.js](https://nodejs.org/) (v14 or higher)
-- [npm](https://www.npmjs.com/) (comes with Node.js)
-- A free API key from [NewsAPI.org](https://newsapi.org/) (or your configured news data provider)
-
----
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/Rashmijoshi18/full-project.git
-cd full-project
+```
+latest-news/
+├── package.json               # Root workspace controller (npm run dev runs concurrently)
+├── news-backend/              # Express API Server
+│   ├── controllers/           # Route logic handlers
+│   ├── models/                # MongoDB/Mongoose Schemas
+│   ├── routes/                # Endpoint routes definitions
+│   ├── render.yaml            # Render hosting cloud configurations
+│   ├── index.js               # Server boot, environment & rate-limit configuration
+│   └── package.json
+└── news-frontend/             # React Application (Vite-powered)
+    ├── vercel.json            # Vercel SPA routing redirects
+    ├── index.html
+    ├── src/
+    │   ├── main.jsx           # Mounting logic and global stylesheet loading
+    │   ├── App.jsx            # Routing, global alerts, and state coordinator
+    │   ├── components/        # Reusable visual components
+    │   │   ├── ErrorBoundary.jsx
+    │   │   ├── Navbar.jsx
+    │   │   ├── NewsCard.jsx
+    │   │   ├── Skeleton.jsx
+    │   │   └── Toast.jsx
+    │   ├── constants/         # Static lookup collections & clients
+    │   │   ├── api.js
+    │   │   └── categories.js
+    │   ├── hooks/             # Custom React Hooks
+    │   │   ├── useBookmarks.js
+    │   │   ├── useDarkMode.js
+    │   │   └── useNews.js
+    │   ├── pages/             # Page-level route targets
+    │   │   ├── Bookmarks.jsx
+    │   │   ├── Home.jsx
+    │   │   └── NotFound.jsx
+    │   ├── styles/            # Themes & Core layouts
+    │   │   ├── global.css
+    │   │   └── variables.css
+    │   └── utils/             # Independent helper modules
+    │       ├── formatDate.js
+    │       └── truncateText.js
+    └── package.json
 ```
 
 ---
 
-### 2. Set Up the Backend
+## ⚙️ Getting Started & Local Setup
 
+Follow these simple steps to run the entire application on your system locally:
+
+### 1. Pre-requisites
+- **Node.js** v18.0.0 or higher
+- **MongoDB** installed and running locally (optional: backend runs and falls back gracefully)
+- A **GNews API Key** (obtain a free key at [GNews.io](https://gnews.io/))
+
+### 2. Clone and Install Root
+Clone the repository, enter the root directory, and run the install script:
 ```bash
-cd news-backend
+git clone https://github.com/Rashmijoshi18/latest-news.git
+cd latest-news
 npm install
 ```
 
-Create a `.env` file in the `news-backend` directory:
-
+### 3. Setup Configurations
+Create a `.env` configuration file inside `news-backend/`:
+```bash
+# Enter news-backend folder
+cd news-backend
+touch .env
+```
+Inside `news-backend/.env`, add:
 ```env
 PORT=5000
-NEWS_API_KEY=your_newsapi_key_here
+GNEWS_API_KEY=your_gnews_api_token_here
+MONGO_URI=mongodb://127.0.0.1:27017/newsapi
 ```
 
-> 💡 Replace `your_newsapi_key_here` with your actual API key from [https://newsapi.org/](https://newsapi.org/)
-
-Start the backend server:
-
+### 4. Launch Application in Development
+Return to the root folder (`latest-news/`) and launch the unified dev server:
 ```bash
-npm start
+cd ..
+npm run dev
 ```
-
-The backend will run at: `http://localhost:5000`
-
----
-
-### 3. Set Up the Frontend
-
-Open a new terminal window:
-
-```bash
-cd news-frontend
-npm install
-```
-
-Create a `.env` file in the `news-frontend` directory (if needed):
-
-```env
-REACT_APP_BACKEND_URL=http://localhost:5000
-```
-
-Start the frontend development server:
-
-```bash
-npm start
-```
-
-The frontend will run at: `http://localhost:3000`
+Both servers boot concurrently:
+- **Frontend App:** [http://localhost:5173](http://localhost:5173) (Vite Dev Server)
+- **Backend API:** [http://localhost:5000](http://localhost:5000) (Express App)
 
 ---
 
-## 🔗 API Endpoints
+## 🔗 Express API Endpoints
 
-The backend exposes the following REST API endpoints:
+The backend routes serve news articles and store MongoDB articles if configured:
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/news` | Fetch top headlines |
-| `GET` | `/api/news?category=technology` | Fetch news by category |
-| `GET` | `/api/news?q=searchterm` | Search news articles |
-
-> **Note:** Endpoint paths may vary. Check `news-backend/` source files for the exact routes defined in your Express app.
+| Method | Endpoint | Query Parameters | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/news` | `country`, `topic`, `q`, `max`, `page` | Fetches live articles using GNews API. Sanitized & validated. |
+| `GET` | `/api/articles` | `topic` | Retrieves saved news from MongoDB database. |
+| `POST` | `/api/articles` | *(Body JSON)* | Saves an article directly into the database. |
 
 ---
 
-## 📂 Folder Details
+## 💻 What I Learned (Interview Highlights)
 
-### `news-backend/`
-```
-news-backend/
-├── routes/          # Express route definitions
-├── controllers/     # Route handler logic
-├── .env             # Environment variables (not committed)
-├── server.js        # Entry point
-└── package.json     # Dependencies & scripts
-```
+Building this application helped me practice and implement several key full-stack software design concepts:
 
-### `news-frontend/`
-```
-news-frontend/
-├── public/          # Static assets
-├── src/
-│   ├── components/  # Reusable React components
-│   ├── pages/       # Page-level components
-│   ├── App.js       # Root component
-│   └── index.js     # Entry point
-├── .env             # Environment variables (not committed)
-└── package.json     # Dependencies & scripts
-```
+* **Custom Hooks for State Isolation:** Separating core logic (fetching news, toggling dark mode, saving bookmarks) into reusable hooks (`useNews`, `useDarkMode`, `useBookmarks`) keeps components modular, testable, and clean.
+* **Optimized Web API Integration:** Using `IntersectionObserver` for infinite scroll instead of bloated external libraries keeps the package bundle small. Implementing debouncing on search parameters saves GNews API quota usage.
+* **Defensive Frontend Engineering:** Wrapped the layout inside a custom React class `ErrorBoundary` so that single-component rendering bugs catch gracefully instead of displaying a blank white browser screen.
+* **REST Security Best Practices:** Added `express-rate-limit` middleware on the Node backend to deter Denial of Service (DoS) and API abuse, alongside validation schemas in `express-validator` to reject malformed parameters.
+* **Offline-Resilience:** Bookmarked articles are managed using client-side `localStorage`, meaning users can recall saved news items even without internet connection or a running MongoDB server database.
 
 ---
 
-## 🧪 Running Both Servers Simultaneously
+## 🌎 Deployment Guide
 
-You can use two separate terminal windows, or install a tool like `concurrently`:
+### Vercel (Frontend Client)
+1. Install Vercel CLI or connect GitHub:
+2. Ensure you have the `vercel.json` rewrite file included in `news-frontend/` (pre-configured).
+3. Set your environment variable: `VITE_BACKEND_URL=https://your-backend-url.render.com`
 
-```bash
-# From the root of the project
-npm install -g concurrently
-
-concurrently "cd news-backend && npm start" "cd news-frontend && npm start"
-```
-
----
-
-## 🌍 Deployment
-
-### Backend
-You can deploy the backend to:
-- [Render](https://render.com/)
-- [Railway](https://railway.app/)
-- [Heroku](https://heroku.com/)
-
-Make sure to set your environment variables (`NEWS_API_KEY`, `PORT`) in your hosting platform's settings.
-
-### Frontend
-You can deploy the frontend to:
-- [Vercel](https://vercel.com/) *(recommended for React apps)*
-- [Netlify](https://netlify.com/)
-- [GitHub Pages](https://pages.github.com/)
-
-Update `REACT_APP_BACKEND_URL` in your deployment environment to point to your hosted backend URL.
-
----
-
-## 🔐 Environment Variables Summary
-
-| Variable | Location | Description |
-|---|---|---|
-| `PORT` | `news-backend/.env` | Port for the backend server |
-| `NEWS_API_KEY` | `news-backend/.env` | API key for news data provider |
-| `REACT_APP_BACKEND_URL` | `news-frontend/.env` | Base URL of the backend API |
-
-> ⚠️ **Never commit `.env` files to version control.** Add `.env` to your `.gitignore`.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how to get started:
-
-1. Fork the repository
-2. Create a new branch: `git checkout -b feature/your-feature-name`
-3. Make your changes and commit: `git commit -m "Add your feature"`
-4. Push to your fork: `git push origin feature/your-feature-name`
-5. Open a Pull Request
-
----
-
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-## 👩‍💻 Author
-
-**Rashmi Joshi**  
-GitHub: [@Rashmijoshi18](https://github.com/Rashmijoshi18)
-
----
-
-> ⭐ If you found this project helpful, please consider giving it a star on GitHub!
+### Render (Backend API Server)
+1. Deploy `news-backend/` as a web service.
+2. Setup environment variables: `GNEWS_API_KEY`, `PORT=5000`.
+3. Render automatically reads the `render.yaml` infrastructure configuration.

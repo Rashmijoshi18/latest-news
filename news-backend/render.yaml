@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: news-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false
+      - key: GNEWS_API_KEY
+        sync: false
