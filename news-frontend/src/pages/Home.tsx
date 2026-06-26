@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import useNews from "../hooks/useNews";
 import useBookmarks, { Article } from "../hooks/useBookmarks";
+import useHistory from "../hooks/useHistory";
 import NewsCard from "../components/NewsCard";
 import Skeleton from "../components/Skeleton";
 import { COUNTRIES, CATEGORIES } from "../constants/categories";
@@ -53,6 +54,7 @@ export default function Home({ onShowToast }: HomeProps) {
   );
   
   const { isBookmarked, toggleBookmark } = useBookmarks();
+  const { addToHistory } = useHistory();
 
   // Progress Bar trigger
   useEffect(() => {
@@ -219,6 +221,7 @@ export default function Home({ onShowToast }: HomeProps) {
               isBookmarked={isBookmarked(article.url)}
               onBookmarkToggle={handleBookmarkToggle}
               onShareSuccess={onShowToast}
+              onCardClick={addToHistory}
             />
           ))}
         </div>

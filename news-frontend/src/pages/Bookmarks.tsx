@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import useBookmarks, { Article } from "../hooks/useBookmarks";
+import useHistory from "../hooks/useHistory";
 import NewsCard from "../components/NewsCard";
 import { CATEGORIES } from "../constants/categories";
 
@@ -10,7 +11,8 @@ interface BookmarksProps {
 
 /**
  * Bookmarks page component to manage locally-saved articles.
- * Displays bookmarked items with search filter functionality.
+ * Displays bookmarked items with search filter functionality, and
+ * lists recently read articles in a persistent history log.
  * 
  * @param props
  * @param props.onShowToast - Callback function to display toast notifications
@@ -20,10 +22,16 @@ export default function Bookmarks({ onShowToast }: BookmarksProps) {
   const [topicFilter, setTopicFilter] = useState<string>("");
   
   const { bookmarks, toggleBookmark, isBookmarked } = useBookmarks();
+  const { history, addToHistory, clearHistory } = useHistory();
 
   const handleBookmarkToggle = (article: Article) => {
     toggleBookmark(article);
     onShowToast("Bookmark status updated");
+  };
+
+  const handleClearHistory = () => {
+    clearHistory();
+    onShowToast("Reading history cleared successfully!");
   };
 
   // Synchronous client-side filtering of local bookmarks
@@ -36,6 +44,25 @@ export default function Bookmarks({ onShowToast }: BookmarksProps) {
       return (titleMatch || descMatch) && categoryMatch;
     });
   }, [bookmarks, searchTerm, topicFilter]);
+
+  // Sync state between history toggling and navbar count if needed
+  const [historyItems, setHistoryItems] = useState<Article[]>(history);
+
+  useEffect(() => {
+    const syncHistory = () => {
+      try {
+        const saved = localStorage.getItem("news_history");
+        setHistoryItems(saved ? JSON.parse(saved) : []);
+      } catch (e) {
+        setHistoryItems([]);
+      }
+    };
+
+    window.addEventListener("historyChanged", syncHistory);
+    return () => {
+      window.removeEventListener("historyChanged", syncHistory);
+    };
+  }, []);
 
   return (
     <div className="container">
@@ -83,7 +110,7 @@ export default function Bookmarks({ onShowToast }: BookmarksProps) {
 
       {/* Empty bookmark state */}
       {bookmarks.length === 0 && (
-        <div className="empty-state-container">
+        <div className="empty-state-container" style={{ marginBottom: "60px" }}>
           <span className="empty-state-icon">⭐</span>
           <h3 className="empty-state-title">No saved articles yet</h3>
           <p className="empty-state-desc">
@@ -97,7 +124,7 @@ export default function Bookmarks({ onShowToast }: BookmarksProps) {
 
       {/* Empty filter results state */}
       {bookmarks.length > 0 && filteredBookmarks.length === 0 && (
-        <div className="empty-state-container">
+        <div className="empty-state-container" style={{ marginBottom: "60px" }}>
           <span className="empty-state-icon">🔍</span>
           <h3 className="empty-state-title">No search matches</h3>
           <p className="empty-state-desc">
@@ -117,7 +144,7 @@ export default function Bookmarks({ onShowToast }: BookmarksProps) {
 
       {/* Bookmarks Grid View */}
       {filteredBookmarks.length > 0 && (
-        <div className="news-grid">
+        <div className="news-grid" style={{ marginBottom: "60px" }}>
           {filteredBookmarks.map((article) => (
             <NewsCard
               key={article.url}
@@ -125,8 +152,46 @@ export default function Bookmarks({ onShowToast }: BookmarksProps) {
               isBookmarked={isBookmarked(article.url)}
               onBookmarkToggle={handleBookmarkToggle}
               onShareSuccess={onShowToast}
+              onCardClick={addToHistory}
             />
           ))}
+        </div>
+      )}
+
+      {/* ──────────────────────────────────────────────────────── */}
+      {/* Dynamic Reading History Dashboard Section */}
+      {historyItems.length > 0 && (
+        <div style={{ marginTop: "60px", borderTop: "2px solid var(--border-color)", paddingTop: "40px" }}>
+          <div className="header-row">
+            <h2 className="header-title" style={{ fontSize: "1.7rem", background: "none", WebkitTextFillColor: "inherit", color: "var(--text-color)" }}>
+              ⏱️ Recently Viewed Articles
+            </h2>
+            <button 
+              className="action-btn"
+              onClick={handleClearHistory}
+              style={{ 
+                backgroundColor: "var(--error-color)", 
+                padding: "8px 16px", 
+                fontSize: "0.85rem", 
+                boxShadow: "none" 
+              }}
+            >
+              Clear History
+            </button>
+          </div>
+          
+          <div className="news-grid">
+            {historyItems.map((article) => (
+              <NewsCard
+                key={`hist-${article.url}`}
+                article={article}
+                isBookmarked={isBookmarked(article.url)}
+                onBookmarkToggle={handleBookmarkToggle}
+                onShareSuccess={onShowToast}
+                onCardClick={addToHistory}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
