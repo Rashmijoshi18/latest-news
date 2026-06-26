@@ -13,17 +13,15 @@ export interface NewsHookResult {
 
 /**
  * Custom hook to handle fetching news articles from the backend server.
- * Handles category, query search, pagination, loading states, and error handling.
+ * Handles category, pagination, loading states, and error handling.
  * 
  * @param category News category (general, technology, etc.)
- * @param query Keyword search input
  * @param page Current page number
  * @param country Selected country code
  * @returns Fetching states, article results, and retry helper.
  */
 export default function useNews(
   category: string,
-  query: string,
   page: number,
   country: string
 ): NewsHookResult {
@@ -41,7 +39,7 @@ export default function useNews(
     setTotalArticles(0);
     setHasMore(true);
     setError(null);
-  }, [category, query, country]);
+  }, [category, country]);
 
   const fetchNews = useCallback(async (isRetry: boolean = false) => {
     const currentRequestId = ++activeRequestRef.current;
@@ -56,7 +54,6 @@ export default function useNews(
       max: number;
       page: number;
       topic?: string;
-      q?: string;
     }
 
     const params: NewsParams = {
@@ -67,9 +64,6 @@ export default function useNews(
 
     if (category) {
       params.topic = category;
-    }
-    if (query && query.trim() !== "") {
-      params.q = query.trim();
     }
 
     let retries = 0;
@@ -140,12 +134,12 @@ export default function useNews(
         setLoading(false);
       }
     }
-  }, [category, query, page, country, hasMore]);
+  }, [category, page, country, hasMore]);
 
   // Fetch articles when parameters update
   useEffect(() => {
     fetchNews();
-  }, [category, query, page, country]);
+  }, [category, page, country]);
 
   return {
     articles,

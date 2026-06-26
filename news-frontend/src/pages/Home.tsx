@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import useNews from "../hooks/useNews";
 import useBookmarks, { Article } from "../hooks/useBookmarks";
-import useHistory from "../hooks/useHistory";
 import NewsCard from "../components/NewsCard";
 import Skeleton from "../components/Skeleton";
 import { COUNTRIES, CATEGORIES } from "../constants/categories";
@@ -12,7 +11,7 @@ interface HomeProps {
 
 /**
  * Home page component for reading the latest news articles.
- * Integrates search, pagination, category filtering, infinite scroll,
+ * Integrates pagination, category filtering, infinite scroll,
  * and visual progress bar animations.
  * 
  * @param props
@@ -22,23 +21,11 @@ export default function Home({ onShowToast }: HomeProps) {
   const [country, setCountry] = useState<string>("in");
   const [category, setCategory] = useState<string>("general");
   const [page, setPage] = useState<number>(1);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   
   // Progress bar animation state
   const [progressState, setProgressState] = useState<"loading" | "finished" | "idle">("idle");
 
   const observerRef = useRef<HTMLDivElement | null>(null);
-
-  // Debounce search queries to optimize backend load
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-      setPage(1);
-    }, 500);
-
-    return () => clearTimeout(delayDebounce);
-  }, [searchTerm]);
 
   // Reset page when category or country changes
   useEffect(() => {
@@ -48,13 +35,11 @@ export default function Home({ onShowToast }: HomeProps) {
   // Hook integrations
   const { articles, loading, error, hasMore, totalArticles, retry } = useNews(
     category,
-    debouncedSearch,
     page,
     country
   );
   
   const { isBookmarked, toggleBookmark } = useBookmarks();
-  const { addToHistory } = useHistory();
 
   // Progress Bar trigger
   useEffect(() => {
@@ -150,18 +135,6 @@ export default function Home({ onShowToast }: HomeProps) {
             ))}
           </select>
         </div>
-
-        <div className="filter-group">
-          <label htmlFor="search-input">Search Keywords</label>
-          <input
-            id="search-input"
-            type="text"
-            className="search-input"
-            placeholder="Type keywords (e.g. tech, markets)..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
       </div>
 
       {/* Results Header Info */}
@@ -191,18 +164,17 @@ export default function Home({ onShowToast }: HomeProps) {
       {/* Initial load skeleton placeholders */}
       {loading && page === 1 && <Skeleton count={6} />}
 
-      {/* Empty Search / Empty list state */}
+      {/* Empty list state */}
       {!loading && articles.length === 0 && !error && (
         <div className="empty-state-container">
           <span className="empty-state-icon">🔍</span>
           <h3 className="empty-state-title">No articles found</h3>
           <p className="empty-state-desc">
-            We couldn't find any articles matching your filters. Try search adjustments or category changes.
+            We couldn't find any articles matching your filters. Try switching category or country filters.
           </p>
           <button
             className="action-btn"
             onClick={() => {
-              setSearchTerm("");
               setCategory("general");
             }}
           >
@@ -221,7 +193,6 @@ export default function Home({ onShowToast }: HomeProps) {
               isBookmarked={isBookmarked(article.url)}
               onBookmarkToggle={handleBookmarkToggle}
               onShareSuccess={onShowToast}
-              onCardClick={addToHistory}
             />
           ))}
         </div>

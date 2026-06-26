@@ -1,105 +1,42 @@
-import { useState, useEffect } from "react";
 import { Article } from "../hooks/useBookmarks";
 import formatDate from "../utils/formatDate";
 import truncateText from "../utils/truncateText";
-import calculateReadingTime from "../utils/calculateReadingTime";
 
 interface NewsCardProps {
   article: Article;
   isBookmarked: boolean;
   onBookmarkToggle: (article: Article) => void;
   onShareSuccess: (message: string) => void;
-  onCardClick?: (article: Article) => void; // Optional history-tracking callback
 }
 
 /**
  * NewsCard component displays a single news article in a grid card.
- * Features Text-to-Speech audio capability, reading time estimates,
- * Web Share integrations, and bookmarks persistence.
+ * Features Web Share integrations and bookmarks persistence.
  * 
  * @param props
  * @param props.article - The article data
  * @param props.isBookmarked - Bookmark status of the article
  * @param props.onBookmarkToggle - Handler function to toggle bookmarks
  * @param props.onShareSuccess - Success callback when link is shared/copied
- * @param props.onCardClick - Trigger callback when user clicks card (tracks history)
  */
 export default function NewsCard({ 
   article, 
   isBookmarked, 
   onBookmarkToggle, 
-  onShareSuccess,
-  onCardClick 
+  onShareSuccess 
 }: NewsCardProps) {
   const { title, description, url, publishedAt, source, topic } = article;
-  
-  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
 
   const imageUrl = article.image || article.urlToImage;
   const sourceName = source?.name || "News";
-  const readingTime = calculateReadingTime(description ? `${title} ${description}` : title);
-
-  // Sync speech state globally across other cards
-  useEffect(() => {
-    const handleGlobalSpeechStart = (e: Event) => {
-      const customEvent = e as CustomEvent<{ url: string }>;
-      if (customEvent.detail?.url !== url) {
-        setIsSpeaking(false);
-      }
-    };
-
-    window.addEventListener("newsSpeechStarted", handleGlobalSpeechStart);
-    
-    // Cleanup SpeechSynthesis when card unmounts
-    return () => {
-      window.removeEventListener("newsSpeechStarted", handleGlobalSpeechStart);
-      if (isSpeaking) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, [url, isSpeaking]);
 
   const handleCardClick = () => {
-    if (onCardClick) {
-      onCardClick(article);
-    }
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const handleBookmarkClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onBookmarkToggle(article);
-  };
-
-  const handleSpeechClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (isSpeaking) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-    } else {
-      // Cancel active speech on other components first
-      window.speechSynthesis.cancel();
-      
-      // Dispatch event to stop play status on other cards
-      window.dispatchEvent(
-        new CustomEvent("newsSpeechStarted", { detail: { url } })
-      );
-
-      const cleanText = `${title}. ${description || "No further details available."}`;
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      
-      utterance.onend = () => {
-        setIsSpeaking(false);
-      };
-      
-      utterance.onerror = () => {
-        setIsSpeaking(false);
-      };
-
-      window.speechSynthesis.speak(utterance);
-      setIsSpeaking(true);
-    }
   };
 
   const handleShareClick = async (e: React.MouseEvent) => {
@@ -162,9 +99,6 @@ export default function NewsCard({
         <div className="news-meta">
           <span className="news-source">{sourceName}</span>
           <span className="news-date">{formatDate(publishedAt)}</span>
-          <span className="news-read-time" style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "2px" }}>
-            ⏱️ {readingTime}
-          </span>
         </div>
 
         <h3 className="news-title" title={title}>
@@ -184,16 +118,6 @@ export default function NewsCard({
               aria-label={isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
             >
               {isBookmarked ? "★" : "☆"}
-            </button>
-
-            <button 
-              className={`card-btn ${isSpeaking ? "speaking" : ""}`}
-              onClick={handleSpeechClick}
-              title={isSpeaking ? "Stop Audio Reader" : "Listen to Article"}
-              aria-label={isSpeaking ? "Stop Audio Reader" : "Listen to Article"}
-              style={{ color: isSpeaking ? "var(--primary-color)" : "inherit" }}
-            >
-              {isSpeaking ? "⏹️" : "🔊"}
             </button>
 
             <button 
